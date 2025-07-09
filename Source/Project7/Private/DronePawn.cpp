@@ -39,10 +39,13 @@ ADronePawn::ADronePawn()
 	// 스프링암을 따라 회전하도록 회전 설정 끄기
 	CameraComp->bUsePawnControlRotation = false;
 	
-	NormalSpeed = 5.f;
+	NormalSpeed = 10.f;
 	DownSpeed = 0.5f;
 	FlySpeed = NormalSpeed * DownSpeed;
 	CurrentSpeed = NormalSpeed;
+	Gravity = -0.98f;
+	FallingSpeed = 0.f;
+	MaxFallingSpeed = -1 * FlySpeed + 0.2f;
 }
 
 // Called when the game starts or when spawned
@@ -69,6 +72,12 @@ void ADronePawn::Tick(float DeltaTime)
 		FRotator FlyNewRotation = FMath::RInterpTo(CurrentRotation, FlyTargetRotation, DeltaTime, RotationInterpSpeed);
 		// 회전 적용
 		SetActorRotation(FlyNewRotation);
+
+
+		FallingSpeed += Gravity * DeltaTime;
+		FallingSpeed = FMath::Clamp(FallingSpeed, MaxFallingSpeed, 0.f);
+		FVector GravityMove = FVector(0.f, 0.f, FallingSpeed);
+		AddActorLocalOffset(GravityMove, true);
 	}
 	else {
 		// 목표 회전값 (Yaw는 현재 값 유지)
@@ -76,6 +85,7 @@ void ADronePawn::Tick(float DeltaTime)
 		FRotator NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaTime, RotationInterpSpeed);
 		// 회전 적용
 		SetActorRotation(NewRotation);
+		FallingSpeed = 0.f;
 	}
 
 }
@@ -115,28 +125,22 @@ void ADronePawn::Move(const FInputActionValue& value)
 {
 	CurrentMoveValue = value.Get<FVector2D>();
 	FVector MoveDir = FVector::ZeroVector;
-
 	if (!FMath::IsNearlyZero(CurrentMoveValue.X)) {
-		MoveDir += FVector(CurrentMoveValue.X, 0.f, 0.f) * CurrentSpeed;
+		MoveDir += GetActorForwardVector() * CurrentMoveValue.X;
 	}
+	
 	if (!FMath::IsNearlyZero(CurrentMoveValue.Y)) {
-		MoveDir += FVector(0.f, CurrentMoveValue.Y, 0.f) * CurrentSpeed;
+		MoveDir += GetActorRightVector() * CurrentMoveValue.Y;
 	}
 
-	AddActorLocalOffset(MoveDir, true);
-
-	FVector WorldForward = GetActorForwardVector();
-	UE_LOG(LogTemp, Warning, TEXT("월드 ForwardVector: X=%.3f, Y=%.3f, Z=%.3f"), WorldForward.X, WorldForward.Y, WorldForward.Z);
-	FVector LocalForward = FVector(1.f, 0.f, 0.f);
-	UE_LOG(LogTemp, Warning, TEXT("로컬 ForwardVector: X=%.3f, Y=%.3f, Z=%.3f"), LocalForward.X, LocalForward.Y, LocalForward.Z);
-
+	MoveDir.Z = 0.f;
+	// 평면 이동 적용
+	AddActorWorldOffset(MoveDir, true);
 }
 
 void ADronePawn::Look(const FInputActionValue& value)
 {
 	FVector2D LookValue = value.Get<FVector2D>();
-	UE_LOG(LogTemp, Warning, TEXT("마우스 입력값: X=%.3f, Y=%.3f"), LookValue.X, LookValue.Y);
-
 
 	if (!FMath::IsNearlyZero(LookValue.Y)) {
 		FRotator ArmRotation = SpringArmComp->GetRelativeRotation();

@@ -44,15 +44,27 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	UCameraComponent* CameraComp;
 
+	// 기본 속도
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
+	float CurrentSpeed; 
+	// 지면 속도
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
+	float NormalSpeed; 
+	// 줄이는 속도(배율)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
+	float DownSpeed; 	
+	// 날때 속도
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
+	float FlySpeed; 	
 
+	// 중력 상수, 낙하 속도
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
-	float CurrentSpeed; 	// 기본 속도
+	float Gravity;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
-	float NormalSpeed; 	// 기본 속도
+	float FallingSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
-	float DownSpeed; 	// 줄이는 속도(배율)
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
-	float FlySpeed; 	// 날때 속도
+	float MaxFallingSpeed;
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Move")
 	bool bIsFly; 	// 날고 있는지 여부

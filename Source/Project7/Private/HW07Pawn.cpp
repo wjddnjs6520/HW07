@@ -83,15 +83,17 @@ void AHW07Pawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 void AHW07Pawn::Move(const FInputActionValue& value)
 {
 	FVector2D MoveValue = value.Get<FVector2D>();
-	FVector MoveDir;
+	FVector MoveDir = FVector::ZeroVector;
 
 	if(!FMath::IsNearlyZero(MoveValue.X)){
 		MoveDir += FVector(MoveValue.X, 0.f, 0.f) * NormalSpeed;
+		
 	}
 	if (!FMath::IsNearlyZero(MoveValue.Y)) {
 		MoveDir += FVector(0.f, MoveValue.Y, 0.f) * NormalSpeed;
 	}
 	AddActorLocalOffset(MoveDir, true);
+
 
 	FVector WorldForward = GetActorForwardVector();
 	UE_LOG(LogTemp, Warning, TEXT("월드 ForwardVector: X=%.3f, Y=%.3f, Z=%.3f"), WorldForward.X, WorldForward.Y, WorldForward.Z);
@@ -104,7 +106,7 @@ void AHW07Pawn::Look(const FInputActionValue& value)
 	FVector2D LookValue = value.Get<FVector2D>();
 	UE_LOG(LogTemp, Warning, TEXT("마우스 입력값: X=%.3f, Y=%.3f"), LookValue.X, LookValue.Y);
 
-	FRotator LookDir;
+	FRotator LookDir = FRotator::ZeroRotator;
 
 	if (!FMath::IsNearlyZero(LookValue.Y)) {
 		FRotator ArmRotation = SpringArmComp->GetRelativeRotation();
@@ -119,9 +121,6 @@ void AHW07Pawn::Look(const FInputActionValue& value)
 		ArmRotation.Yaw += LookValue.X;
 		SpringArmComp->SetRelativeRotation(ArmRotation);
 	}
-
-	
-
 }
 
 
