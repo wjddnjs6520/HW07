@@ -126,11 +126,11 @@ void ADronePawn::Move(const FInputActionValue& value)
 	CurrentMoveValue = value.Get<FVector2D>();
 	FVector MoveDir = FVector::ZeroVector;
 	if (!FMath::IsNearlyZero(CurrentMoveValue.X)) {
-		MoveDir += GetActorForwardVector() * CurrentMoveValue.X;
+		MoveDir += GetActorForwardVector() * CurrentMoveValue.X * CurrentSpeed;
 	}
 	
 	if (!FMath::IsNearlyZero(CurrentMoveValue.Y)) {
-		MoveDir += GetActorRightVector() * CurrentMoveValue.Y;
+		MoveDir += GetActorRightVector() * CurrentMoveValue.Y * CurrentSpeed;
 	}
 
 	MoveDir.Z = 0.f;
